@@ -1,0 +1,53 @@
+sudo amazon-linux-extras install nginx1
+sudo systemctl start nginx.service
+sudo service nginx start
+sudo chmod -R a+rwx /usr/share/nginx/html
+
+chmod 6000 kepair.pem - change file permission
+
+****** port forwarding to connect to private subnet ec2 ******
+1. ssh -i "my-app-keypair.pem" ec2-user@34.217.48.183 -L 9999:10.0.2.106:22 
+2. ssh -i "my-app-keypair.pem" ec2-user@localhost -p9999
+
+
+****** port forwarding to connect to private subnet web page ******
+1. ssh -i "my-app-keypair.pem" ec2-user@34.217.48.183 -L 9999:10.0.2.106:80 
+2. access "http://localhost:9999" in the browser
+
+
+****** Install MySQL on EC2 Instance ******
+1. sudo yum update
+2. sudo yum install https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm
+2. ls /etc/yum.repos.d
+3. sudo yum repolist
+3. sudo amazon-linux-extras install epel -y
+3. sudo yum -y install mysql-community-server
+sudo systemctl enable --now mysqld
+systemctl status mysqld
+sudo grep 'temporary password' /var/log/mysqld.log
+sudo mysql_secure_installation -p
+
+4. Edit my.cnf file using -> sudo vi /etc/my.cnf
+5. Add line to mysqld block.* -> skip-grant-tables
+6. Restart MySQL service. -> sudo service mysqld restart
+7. Check service status. -> sudo service mysqld status
+8. Connect to mysql. -> sudo mysql
+9. Using main database. -> use mysql;
+10. Redefine user root password. -> UPDATE mysql.user SET `authentication_string` = null WHERE `User` = 'root';
+10. FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'my password';
+FLUSH PRIVILEGES;
+11. Edit file my.cnf. -> sudo vi /etc/my.cnf
+12. Erase line. -> skip-grant-tables
+13. Save and exit.
+14. Restart MySQL service. -> sudo service mysqld restart
+15. Connect to database. -> mysql -u root -p
+
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost' WITH GRANT OPTION;
+CREATE USER 'username'@'%' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'username'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+****** Security Group Best Practice ******
